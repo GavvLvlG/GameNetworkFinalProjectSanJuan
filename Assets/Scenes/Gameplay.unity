@@ -1166,9 +1166,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
       insertIndex: -1
       addedObject: {fileID: 957426596964335386}
-    - targetCorrespondingSourceObject: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 957426596964335393}
   m_SourcePrefab: {fileID: 100100000, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
 --- !u!1 &957426596964335384 stripped
 GameObject:
@@ -1253,28 +1250,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5098362071162368962, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
   m_PrefabInstance: {fileID: 957426596964335383}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &957426596964335393
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 957426596964335384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22bc7b928fbdaa444aa77ae51e51e17e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  moveSpeed: 5
-  sprintSpeed: 8
-  gravity: -20
-  groundedForce: -2
-  playerCamera: {fileID: 0}
-  cameraPivot: {fileID: 0}
-  mouseSensitivity: 2
-  minLookAngle: -80
-  maxLookAngle: 80
-  lockCursorOnStart: 1
 --- !u!1001 &4347885069377147312
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1333,7 +1308,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8962305814189608433, guid: fcb7e5253baeea1428f0cb241d5d9f54, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
