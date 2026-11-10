@@ -294,6 +294,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4652720554471429214, guid: b4d793b1680e745458847642802df4c2, type: 3}
   m_PrefabInstance: {fileID: 2110121819}
   m_PrefabAsset: {fileID: 0}
+--- !u!20 &1079681390 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 7357078367146455234, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
+  m_PrefabInstance: {fileID: 957426596964335383}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1427609638
 GameObject:
   m_ObjectHideFlags: 0
@@ -745,6 +750,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 586307329424955512, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
+      propertyPath: _interactionCamera
+      value: 
+      objectReference: {fileID: 1079681390}
     - target: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
       propertyPath: m_Name
       value: Multiplayer Controller
