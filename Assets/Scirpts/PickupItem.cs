@@ -27,7 +27,7 @@ public class PickupItem : NetworkBehaviour
     private Quaternion _heldRotation = Quaternion.identity;
     private Transform _holderCamPoint;
 
-    // Root of the holding player — used to exclude the holder from surface raycasts.
+    // Root of the holding player â€” used to exclude the holder from surface raycasts.
     private GameObject _holderRoot;
 
     private float _currentDist;
@@ -60,7 +60,7 @@ public class PickupItem : NetworkBehaviour
 
         if (held)
         {
-            // Clear velocities before making kinematic — Unity 6 blocks writes on kinematic bodies.
+            // Clear velocities before making kinematic â€” Unity 6 blocks writes on kinematic bodies.
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
         }
@@ -99,7 +99,7 @@ public class PickupItem : NetworkBehaviour
             break;
         }
 
-        // Auto-drop when jammed at minimum distance — item is stuck against geometry.
+        // Auto-drop when jammed at minimum distance â€” item is stuck against geometry.
         if (rawTarget <= _minHoldDistance + 0.01f)
         {
             _stuckTimer += Time.deltaTime;
