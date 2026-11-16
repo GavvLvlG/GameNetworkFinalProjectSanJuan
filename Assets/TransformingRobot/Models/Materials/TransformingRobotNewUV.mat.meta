@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3b1f295f4c797c14bb71d7ed21fd0a80
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 44055
+  packageName: Transforming Robot
+  packageVersion: 1.1
+  assetPath: Assets/TransformingRobot/Models/Materials/TransformingRobotNewUV.mat
+  uploadId: 757436

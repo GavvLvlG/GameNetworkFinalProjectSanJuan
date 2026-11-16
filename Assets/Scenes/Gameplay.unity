@@ -304,6 +304,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1079992226653759562, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
   m_PrefabInstance: {fileID: 957426596964335383}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1163652376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163652378}
+  - component: {fileID: 1163652377}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1163652377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163652376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bda8c43cf400f49faafd35e5e22dea10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawnManager
+  _spawnPoints:
+  - {fileID: 1497300482}
+  - {fileID: 1875475477}
+  - {fileID: 1038400461}
+  - {fileID: 1864912029}
+--- !u!4 &1163652378
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163652376}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.75965, y: 1.79919, z: 1.50098}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1427609638
 GameObject:
   m_ObjectHideFlags: 0
@@ -610,6 +659,49 @@ MonoBehaviour:
   _eyeBaseY: 0.3
   _travelRange: 0.35
   _maxPitch: 80
+--- !u!114 &1831469589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831469577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1a0bbe9d826b44879a06c073dff8e07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerNetworkBridge
+  ShowTopMostFoldoutHeaderGroup: 1
+  gameSceneName: Gameplay
+--- !u!114 &1831469590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831469577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b9a771751b345d8991b4f4a4dd5384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerColour
+  ShowTopMostFoldoutHeaderGroup: 1
+  _headRenderer: {fileID: 1831469598}
+  _materials:
+  - {fileID: 2100000, guid: e2a6630917c094a49bdc799f3e05b8e8, type: 2}
+  - {fileID: 2100000, guid: e9e947a605dfd4d02857cc0f4f426d71, type: 2}
+  - {fileID: 2100000, guid: 6f267545697c14ea8993ba51d4f14159, type: 2}
+  - {fileID: 2100000, guid: bdb34dc55b91d44bead0850c1ccdb5b7, type: 2}
+  PlayerIndex:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: -1
+--- !u!23 &1831469598 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3449840014659749418, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
+  m_PrefabInstance: {fileID: 957426596964335383}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1864912029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4652720554471429214, guid: b4d793b1680e745458847642802df4c2, type: 3}
@@ -844,6 +936,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1831469588}
+    - targetCorrespondingSourceObject: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1831469590}
+    - targetCorrespondingSourceObject: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1831469589}
   m_SourcePrefab: {fileID: 100100000, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
 --- !u!4 &957426596964335384 stripped
 Transform:
@@ -946,3 +1044,4 @@ SceneRoots:
   - {fileID: 4347885069377147312}
   - {fileID: 957426596964335383}
   - {fileID: 2102023158}
+  - {fileID: 1163652378}

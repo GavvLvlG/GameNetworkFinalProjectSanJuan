@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: baf4e84ed0f774cbca60ff99a152d3cb
+timeCreated: 1442105140
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 44055
+  packageName: Transforming Robot
+  packageVersion: 1.1
+  assetPath: Assets/TransformingRobot/Models/Materials/transformingrobotcloth.mat
+  uploadId: 757436

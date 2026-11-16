@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 811dc2de8c536485eb4843a0921fdd93
+timeCreated: 1442056292
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 44055
+  packageName: Transforming Robot
+  packageVersion: 1.1
+  assetPath: Assets/TransformingRobot/Scenes/demoOld.unity
+  uploadId: 757436

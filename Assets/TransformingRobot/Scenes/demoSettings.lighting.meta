@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3b5885ad8b2e62c4d9ff575274d398fb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 44055
+  packageName: Transforming Robot
+  packageVersion: 1.1
+  assetPath: Assets/TransformingRobot/Scenes/demoSettings.lighting
+  uploadId: 757436

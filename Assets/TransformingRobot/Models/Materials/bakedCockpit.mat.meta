@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e0b35d2e7ab3148c0ac5399e8d391762
+timeCreated: 1442105139
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 44055
+  packageName: Transforming Robot
+  packageVersion: 1.1
+  assetPath: Assets/TransformingRobot/Models/Materials/bakedCockpit.mat
+  uploadId: 757436
