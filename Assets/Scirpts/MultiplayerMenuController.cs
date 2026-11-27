@@ -1,4 +1,4 @@
-
+using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -28,6 +28,8 @@ public class MultiplayerMenuController : MonoBehaviour, IMultiplayerMenuControll
     [SerializeField] private Button clientButton;
     [SerializeField] private Button continueToLobbyButton;
 
+    private NetworkManager _subscribedNetworkManager;
+
     private void Start()
     {
         if (mainPanel == null || hostingPanel == null || lobbyPanel == null ||
@@ -45,6 +47,10 @@ public class MultiplayerMenuController : MonoBehaviour, IMultiplayerMenuControll
         hostButton.onClick.AddListener(StartHostGame);
         clientButton.onClick.AddListener(StartClientGame);
         continueToLobbyButton.onClick.AddListener(OpenLobbyPanel);
+
+        _subscribedNetworkManager = NetworkManager.Singleton;
+        if (_subscribedNetworkManager != null)
+            _subscribedNetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
     private void OnDestroy()
@@ -57,65 +63,94 @@ public class MultiplayerMenuController : MonoBehaviour, IMultiplayerMenuControll
 
         if (continueToLobbyButton != null)
             continueToLobbyButton.onClick.RemoveListener(OpenLobbyPanel);
+
+        if (_subscribedNetworkManager != null)
+            _subscribedNetworkManager.OnClientDisconnectCallback -= OnClientDisconnected;
     }
 
     public void StartHostGame()
     {
-        if (NetworkManager.Singleton == null)
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager == null)
         {
-            Debug.LogError("No active NetworkManager found in the scene.");
+            Debug.LogError("No active NetworkManager found in the scene.", this);
             return;
         }
 
-        if (NetworkManager.Singleton.StartHost())
+        if (networkManager.IsListening)
         {
-            Debug.Log("Host started successfully.");
+            Debug.LogWarning("A network session is already active.", this);
+            return;
+        }
+
+        if (networkManager.StartHost())
+        {
+            Debug.Log("Host started successfully.", this);
             OpenHostingPanel();
         }
         else
         {
-            Debug.LogError("Failed to start host.");
+            Debug.LogError("Failed to start host.", this);
         }
     }
 
     public void StartClientGame()
     {
-        if (ipAddressInput == null)
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager == null)
         {
-            Debug.LogError("Assign the IP Address Input Field in the Inspector.", this);
+            Debug.LogError("No active NetworkManager found in the scene.", this);
             return;
         }
 
-        if (NetworkManager.Singleton == null)
+        if (networkManager.IsListening)
         {
-            Debug.LogError("No active NetworkManager found in the scene.");
+            Debug.LogWarning("A network session is already active.", this);
             return;
         }
 
-        UnityTransport transport =
-            NetworkManager.Singleton.GetComponent<UnityTransport>();
+        if (ipAddressInput == null || string.IsNullOrWhiteSpace(ipAddressInput.text))
+        {
+            Debug.LogWarning("Enter the host IP address before joining.", this);
+            return;
+        }
 
+        if (!IPAddress.TryParse(ipAddressInput.text.Trim(), out IPAddress targetAddress) ||
+            targetAddress.Equals(IPAddress.Any) || targetAddress.Equals(IPAddress.IPv6Any))
+        {
+            Debug.LogWarning("Enter a valid IPv4 or IPv6 host address.", this);
+            return;
+        }
+
+        UnityTransport transport = networkManager.GetComponent<UnityTransport>();
         if (transport == null)
         {
-            Debug.LogError("UnityTransport is missing from the NetworkManager.");
+            Debug.LogError("UnityTransport is missing from the NetworkManager.", this);
             return;
         }
 
-        string targetIP = string.IsNullOrWhiteSpace(ipAddressInput.text)
-            ? "127.0.0.1"
-            : ipAddressInput.text.Trim();
-
-        transport.ConnectionData.Address = targetIP;
-
-        if (NetworkManager.Singleton.StartClient())
+        transport.ConnectionData.Address = targetAddress.ToString();
+        if (networkManager.StartClient())
         {
-            Debug.Log($"Connecting to host at {targetIP}...");
+            Debug.Log($"Connecting to host at {targetAddress}...", this);
             OpenLobbyPanel();
         }
         else
         {
-            Debug.LogError("Failed to start client.");
+            Debug.LogError("Failed to start client.", this);
         }
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        if (_subscribedNetworkManager == null || _subscribedNetworkManager.IsServer ||
+            clientId != _subscribedNetworkManager.LocalClientId)
+        {
+            return;
+        }
+
+        Debug.LogWarning("Disconnected from the host. Return to the main menu and try again.", this);
+        OpenMainPanel();
     }
 
     private void OpenHostingPanel()
@@ -132,22 +167,37 @@ public class MultiplayerMenuController : MonoBehaviour, IMultiplayerMenuControll
         lobbyPanel.SetActive(true);
     }
 
+    private void OpenMainPanel()
+    {
+        mainPanel.SetActive(true);
+        hostingPanel.SetActive(false);
+        lobbyPanel.SetActive(false);
+    }
+
     public void EnterGameScene()
     {
-        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsHost)
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager == null || !networkManager.IsListening || !networkManager.IsHost)
         {
-            Debug.LogWarning("Only the host can start the game.");
+            Debug.LogWarning("Only the active host can start the game.", this);
             return;
         }
 
-        NetworkManager.Singleton.SceneManager.LoadScene(
-            gameSceneName,
-            LoadSceneMode.Single
-        );
+        if (networkManager.SceneManager == null || string.IsNullOrWhiteSpace(gameSceneName))
+        {
+            Debug.LogError("Network scene management or the gameplay scene name is not configured.", this);
+            return;
+        }
+
+        networkManager.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
     }
 
     public void QuitGame()
     {
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager != null && networkManager.IsListening)
+            networkManager.Shutdown();
+
         Application.Quit();
     }
 }

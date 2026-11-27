@@ -780,6 +780,7 @@ GameObject:
   - component: {fileID: 507415362}
   - component: {fileID: 507415364}
   - component: {fileID: 507415363}
+  - component: {fileID: 507415365}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -827,7 +828,7 @@ MonoBehaviour:
     Address: 127.0.0.1
     Port: 7777
     WebSocketPath: /
-    ServerListenAddress: 127.0.0.1
+    ServerListenAddress: 0.0.0.0
     ClientBindPort: 0
   DebugSimulator:
     PacketDelayMS: 0
@@ -849,16 +850,16 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 507415363}
-    PlayerPrefab: {fileID: 0}
+    PlayerPrefab: {fileID: 2153059015922141449, guid: 513eff30cb621450f88a3d70b86e6152, type: 3}
     Prefabs:
       NetworkPrefabsLists: []
     TickRate: 30
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
+    ConnectionApproval: 1
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
-    EnsureNetworkVariableLengthSafety: 0
+    EnsureNetworkVariableLengthSafety: 1
     EnableSceneManagement: 1
     ForceSamePrefabs: 1
     RecycleNetworkIds: 1
@@ -875,6 +876,19 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
+--- !u!114 &507415365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507415360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ff45b0a84b4643689a53950746d8de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkConnectionApproval
+  _maxPlayers: 4
 --- !u!1 &521519294
 GameObject:
   m_ObjectHideFlags: 0

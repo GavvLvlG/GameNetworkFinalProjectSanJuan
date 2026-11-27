@@ -4,17 +4,23 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Bridges PlayerMovement with NGO ownership and gameplay scene loading.
+/// Restricts local input, cameras, and audio listeners to the owning client while keeping server movement active.
 /// </summary>
 public class PlayerNetworkBridge : NetworkBehaviour
 {
     [SerializeField] private string gameSceneName = "Gameplay";
 
     private PlayerMovement _movement;
+    private PlayerInput _playerInput;
+    private Camera[] _playerCameras;
+    private AudioListener[] _audioListeners;
 
     private void Awake()
     {
         _movement = GetComponent<PlayerMovement>();
+        _playerInput = GetComponent<PlayerInput>();
+        _playerCameras = GetComponentsInChildren<Camera>(true);
+        _audioListeners = GetComponentsInChildren<AudioListener>(true);
 
         if (_movement == null)
             Debug.LogError("PlayerMovement component is missing.", this);
@@ -22,32 +28,46 @@ public class PlayerNetworkBridge : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsOwner)
-        {
-            // Remote players must be on Default layer so other FPS cameras can see them.
-            int defaultLayer = LayerMask.NameToLayer("Default");
+        bool isLocalOwner = IsOwner && IsClient;
+        ConfigureLocalComponents(isLocalOwner);
 
+        if (!isLocalOwner)
+        {
+            int defaultLayer = LayerMask.NameToLayer("Default");
             if (defaultLayer >= 0)
             {
-                foreach (Transform t in GetComponentsInChildren<Transform>(true))
-                    t.gameObject.layer = defaultLayer;
+                foreach (Transform child in GetComponentsInChildren<Transform>(true))
+                    child.gameObject.layer = defaultLayer;
             }
-
-            PlayerInput playerInput = GetComponent<PlayerInput>();
-            if (playerInput != null)
-                playerInput.enabled = false;
-
-            if (_movement != null)
-                _movement.enabled = false;
-
-            return;
         }
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        if (!IsOwner)
+            return;
 
-        // Handle the case where this player spawns after the gameplay scene is loaded.
+        SceneManager.sceneLoaded += OnSceneLoaded;
         if (SceneManager.GetActiveScene().name == gameSceneName)
             StartPlaying();
+    }
+
+    private void ConfigureLocalComponents(bool isLocalOwner)
+    {
+        if (_playerInput != null)
+            _playerInput.enabled = isLocalOwner;
+
+        foreach (Camera playerCamera in _playerCameras)
+        {
+            if (playerCamera != null)
+                playerCamera.enabled = isLocalOwner;
+        }
+
+        foreach (AudioListener audioListener in _audioListeners)
+        {
+            if (audioListener != null)
+                audioListener.enabled = isLocalOwner;
+        }
+
+        if (_movement != null)
+            _movement.enabled = IsServer || isLocalOwner;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -56,11 +76,11 @@ public class PlayerNetworkBridge : NetworkBehaviour
             StartPlaying();
     }
 
-   private void StartPlaying()
-{
-    if (_movement != null)
-        _movement.enabled = true;
-}
+    private void StartPlaying()
+    {
+        if (_movement != null && (IsServer || IsOwner))
+            _movement.enabled = true;
+    }
 
     public override void OnNetworkDespawn()
     {

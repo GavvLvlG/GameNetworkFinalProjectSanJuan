@@ -1,61 +1,123 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
-/// Approves connections and spawns players at designated spawn points.
+/// Spawns one server-owned player object at an available spawn point per approved client.
 /// </summary>
 [DefaultExecutionOrder(-10)]
 public class PlayerSpawnManager : MonoBehaviour
 {
     [SerializeField] private Transform[] _spawnPoints;
 
-    private int _nextSpawnIndex;
+    private readonly Dictionary<ulong, int> _clientSpawnSlots = new Dictionary<ulong, int>();
+    private NetworkManager _networkManager;
 
     private void Start()
     {
-        if (NetworkManager.Singleton == null) return;
-        NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
-        NetworkManager.Singleton.ConnectionApprovalCallback += OnApprove;
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        NetworkManager.Singleton.OnServerStopped += OnServerStopped;
+        _networkManager = NetworkManager.Singleton;
+        if (_networkManager == null)
+        {
+            Debug.LogError("[SpawnManager] No active NetworkManager was found.", this);
+            return;
+        }
+
+        _networkManager.OnClientConnectedCallback += OnClientConnected;
+        _networkManager.OnClientDisconnectCallback += OnClientDisconnected;
+        _networkManager.OnServerStopped += OnServerStopped;
+
+        if (_networkManager.IsServer)
+        {
+            foreach (ulong clientId in _networkManager.ConnectedClients.Keys)
+                OnClientConnected(clientId);
+        }
     }
 
     private void OnDestroy()
     {
-        if (NetworkManager.Singleton == null) return;
-        NetworkManager.Singleton.ConnectionApprovalCallback -= OnApprove;
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-        NetworkManager.Singleton.OnServerStopped -= OnServerStopped;
+        if (_networkManager == null)
+            return;
+
+        _networkManager.OnClientConnectedCallback -= OnClientConnected;
+        _networkManager.OnClientDisconnectCallback -= OnClientDisconnected;
+        _networkManager.OnServerStopped -= OnServerStopped;
     }
 
-    // Approve up to 4 players; tell NGO we handle spawning ourselves.
-    private void OnApprove(NetworkManager.ConnectionApprovalRequest req, NetworkManager.ConnectionApprovalResponse res)
-    {
-        res.Approved = _nextSpawnIndex < _spawnPoints.Length;
-        res.CreatePlayerObject = false;
-    }
-
-    // Runs on server only — instantiate the player at the next available spawn point.
     private void OnClientConnected(ulong clientId)
     {
-        if (!NetworkManager.Singleton.IsServer) return;
-        if (_nextSpawnIndex >= _spawnPoints.Length) return;
+        if (_networkManager == null || !_networkManager.IsServer || _clientSpawnSlots.ContainsKey(clientId))
+            return;
 
-        int spawnIndex = _nextSpawnIndex++;
-        Transform spawn = _spawnPoints[spawnIndex];
-        var prefab = NetworkManager.Singleton.NetworkConfig.PlayerPrefab;
-        if (prefab == null) { Debug.LogError("[SpawnManager] PlayerPrefab is null on NetworkConfig!"); return; }
+        int spawnIndex = FindAvailableSpawnIndex();
+        if (spawnIndex < 0)
+        {
+            Debug.LogWarning($"[SpawnManager] No valid spawn slot is available for client {clientId}; disconnecting.", this);
+            _networkManager.DisconnectClient(clientId);
+            return;
+        }
 
-        var go = Instantiate(prefab, spawn.position, spawn.rotation);
-        var no = go.GetComponent<NetworkObject>();
-        if (no == null) { Debug.LogError("[SpawnManager] Player prefab has no NetworkObject!"); return; }
+        GameObject playerPrefab = _networkManager.NetworkConfig.PlayerPrefab;
+        if (playerPrefab == null)
+        {
+            Debug.LogError("[SpawnManager] PlayerPrefab is not assigned in NetworkConfig.", this);
+            _networkManager.DisconnectClient(clientId);
+            return;
+        }
 
-        no.SpawnAsPlayerObject(clientId, destroyWithScene: true);
+        Transform spawnPoint = _spawnPoints[spawnIndex];
+        GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+        NetworkObject networkObject = player.GetComponent<NetworkObject>();
+        if (networkObject == null)
+        {
+            Debug.LogError("[SpawnManager] Player prefab has no NetworkObject component.", player);
+            Destroy(player);
+            _networkManager.DisconnectClient(clientId);
+            return;
+        }
 
-        var colour = go.GetComponent<PlayerColour>();
-        if (colour != null) colour.PlayerIndex.Value = spawnIndex;
+        networkObject.SpawnAsPlayerObject(clientId, destroyWithScene: true);
+        _clientSpawnSlots.Add(clientId, spawnIndex);
+
+        PlayerColour colour = player.GetComponent<PlayerColour>();
+        if (colour != null)
+            colour.PlayerIndex.Value = spawnIndex;
     }
 
-    // Reset the index when the session ends so the next host starts fresh.
-    private void OnServerStopped(bool _) => _nextSpawnIndex = 0;
+    private void OnClientDisconnected(ulong clientId)
+    {
+        _clientSpawnSlots.Remove(clientId);
+    }
+
+    private void OnServerStopped(bool _)
+    {
+        _clientSpawnSlots.Clear();
+    }
+
+    private int FindAvailableSpawnIndex()
+    {
+        if (!HasValidSpawnPoints())
+            return -1;
+
+        for (int index = 0; index < _spawnPoints.Length; index++)
+        {
+            if (!_clientSpawnSlots.ContainsValue(index))
+                return index;
+        }
+
+        return -1;
+    }
+
+    private bool HasValidSpawnPoints()
+    {
+        if (_spawnPoints == null || _spawnPoints.Length == 0)
+            return false;
+
+        for (int index = 0; index < _spawnPoints.Length; index++)
+        {
+            if (_spawnPoints[index] == null)
+                return false;
+        }
+
+        return true;
+    }
 }
